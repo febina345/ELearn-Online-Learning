@@ -13,6 +13,7 @@ function AuthPage() {
     setSignInFormData,
     signUpFormData,
     handleRegisterUser,
+    handleLoginUser,
     setSignUpFormData} = useContext(AuthContext)
 
   
@@ -77,6 +78,7 @@ function AuthPage() {
               formData={signInFormData}
               setFormData={setSignInFormData}
               isButtonDisabled={!checkIfSignInFormIsValid()}
+              handleSubmit={handleLoginUser}
               />
            
             </CardContent>
