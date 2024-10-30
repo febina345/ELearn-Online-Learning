@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Button } from './components/ui/button'
+import { Routes,Route } from 'react-router-dom'
+import AuthPage from './pages/auth';
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <Button className="bg-red-600">Check</Button>
-    </>
+    <Routes>
+      <Route path="/auth" element ={<AuthPage/>}/>
+    </Routes>
   )
 }
 
