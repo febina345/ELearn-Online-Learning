@@ -17,7 +17,7 @@ app.use(cors({
 
 app.use(express.json());
 
-//database connection
+//database connection exists here
 
 mongoose.connect(MONGO_URI)
 .then(()=>console.log('mongodb is connected'))
