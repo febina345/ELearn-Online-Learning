@@ -31,10 +31,17 @@ async function handleLoginUser(event){
             authenticat : true,
             user: data.data.user,
         })
+    }else{
+        setAuth({
+            authenticat : false,
+            user:null,
+        })
+
     }
     console.log(data);
 }
-    
+ 
+//check auth user
 
 
      
