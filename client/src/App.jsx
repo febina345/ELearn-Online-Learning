@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { Routes,Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import AuthPage from './pages/auth';
 import RouteGuard from './components/route-guard';
 import { AuthContext } from './context/auth-context';
@@ -7,14 +7,15 @@ import InstructorDashboardpage from './pages/instructor';
 import StudentViewCommonLayout from './components/student-view/common-layout';
 import StudentHomePage from './pages/student/home';
 import NotFoundPage from './pages/not-found';
+import AddNewCoursePage from './pages/instructor/add-new-course';
 
 function App() {
-  
-  const {auth} = useContext(AuthContext)
+
+  const { auth } = useContext(AuthContext)
 
   return (
     <Routes>
-       <Route
+      <Route
         path="/auth"
         element={
           <RouteGuard
@@ -34,8 +35,19 @@ function App() {
           />
         }
       />
-      
-      
+
+      <Route
+        path="/instructor/create-new-course"
+        element={
+          <RouteGuard
+            element={<AddNewCoursePage />}
+            authenticated={auth?.authenticate}
+            user={auth?.user}
+          />
+        }
+      />
+
+
       <Route
         path="/"
         element={
@@ -55,4 +67,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
