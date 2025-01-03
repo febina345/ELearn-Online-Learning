@@ -6,11 +6,15 @@ import { Switch } from "@/components/ui/switch";
 import { courseCurriculumInitialFormData } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
 import { useContext } from "react";
+import { mediaUploadService } from "@/services";
 
 
 function CourseCurriculum() {
 
-  const { courseCurriculumFormData, setCourseCurriculumFormData } =
+  const { courseCurriculumFormData, 
+    setCourseCurriculumFormData, 
+    mediaUploadProgress,
+    setMediaUploadProgress } =
     useContext(InstructorContext);
 
   function handleNewLecture() {
@@ -40,6 +44,37 @@ function CourseCurriculum() {
     };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+ async function handleSingleLectureUpload(event, currentIndex){
+    console.log(event.target.files);
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile) {
+      const videoFormData = new FormData();
+      videoFormData.append("file", selectedFile);
+
+      try{
+        setMediaUploadProgress(true);
+        const response = await mediaUploadService(
+          videoFormData
+        );
+        if (response.success){
+          let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+          cpyCourseCurriculumFormData[currentIndex] = {
+            ...cpyCourseCurriculumFormData[currentIndex],
+            videoUrl: response?.data?.url,
+            public_id: response?.data?.public_id,
+          }
+          setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+          setMediaUploadProgress(false);
+        }
+      
+
+      }catch(error){
+         console.log(error);
+      }
+    }
   }
 
   console.log(courseCurriculumFormData)
@@ -82,6 +117,9 @@ function CourseCurriculum() {
                   <Input
                     type="file"
                     accept="video/*"
+                    onChange={(event) =>
+                      handleSingleLectureUpload(event, index)
+                    }
                     className="mb-4"
                   />
                 </div>
