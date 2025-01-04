@@ -7,14 +7,17 @@ import { courseCurriculumInitialFormData } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
 import { useContext } from "react";
 import { mediaUploadService } from "@/services";
+import MediaProgressbar from "@/components/media-progress-bar";
 
 
 function CourseCurriculum() {
 
-  const { courseCurriculumFormData, 
-    setCourseCurriculumFormData, 
+  const { courseCurriculumFormData,
+    setCourseCurriculumFormData,
     mediaUploadProgress,
-    setMediaUploadProgress } =
+    setMediaUploadProgress,
+    mediaUploadProgressPercentage,
+    setMediaUploadProgressPercentage, } =
     useContext(InstructorContext);
 
   function handleNewLecture() {
@@ -46,7 +49,7 @@ function CourseCurriculum() {
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
 
- async function handleSingleLectureUpload(event, currentIndex){
+  async function handleSingleLectureUpload(event, currentIndex) {
     console.log(event.target.files);
     const selectedFile = event.target.files[0];
 
@@ -54,12 +57,13 @@ function CourseCurriculum() {
       const videoFormData = new FormData();
       videoFormData.append("file", selectedFile);
 
-      try{
+      try {
         setMediaUploadProgress(true);
         const response = await mediaUploadService(
-          videoFormData
+          videoFormData,
+          setMediaUploadProgressPercentage
         );
-        if (response.success){
+        if (response.success) {
           let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
           cpyCourseCurriculumFormData[currentIndex] = {
             ...cpyCourseCurriculumFormData[currentIndex],
@@ -69,10 +73,10 @@ function CourseCurriculum() {
           setCourseCurriculumFormData(cpyCourseCurriculumFormData);
           setMediaUploadProgress(false);
         }
-      
 
-      }catch(error){
-         console.log(error);
+
+      } catch (error) {
+        console.log(error);
       }
     }
   }
@@ -88,6 +92,12 @@ function CourseCurriculum() {
       </CardHeader>
       <CardContent>
         <Button onClick={handleNewLecture}>Add Lecture</Button>
+        {mediaUploadProgress ? (
+          <MediaProgressbar
+            isMediaUploading={mediaUploadProgress}
+            progress={mediaUploadProgressPercentage}
+          />
+        ) : null}
         <div className="mt-4 space-y-4">
           {
             courseCurriculumFormData.map((curriculumItem, index) => (
