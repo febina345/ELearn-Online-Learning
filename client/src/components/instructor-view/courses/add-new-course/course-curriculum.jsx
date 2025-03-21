@@ -8,6 +8,7 @@ import { InstructorContext } from "@/context/instructor-context";
 import { useContext } from "react";
 import { mediaUploadService } from "@/services";
 import MediaProgressbar from "@/components/media-progress-bar";
+import VideoPlayer from "@/components/video-player";
 
 
 function CourseCurriculum() {
@@ -50,7 +51,7 @@ function CourseCurriculum() {
   }
 
   async function handleSingleLectureUpload(event, currentIndex) {
-    console.log(event.target.files);
+    
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
@@ -124,6 +125,24 @@ function CourseCurriculum() {
 
                 </div>
                 <div className="mt-6">
+                {courseCurriculumFormData[index]?.videoUrl ? (
+                  <div className="flex gap-3">
+                    <VideoPlayer
+                      url={courseCurriculumFormData[index]?.videoUrl}
+                      width="450px"
+                      height="200px"
+                    />
+                    <Button onClick={() => handleReplaceVideo(index)}>
+                      Replace Video
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteLecture(index)}
+                      className="bg-red-900"
+                    >
+                      Delete Lecture
+                    </Button>
+                  </div>
+                ) : (
                   <Input
                     type="file"
                     accept="video/*"
@@ -132,6 +151,7 @@ function CourseCurriculum() {
                     }
                     className="mb-4"
                   />
+                )}
                 </div>
               </div>
             ))
