@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { courseCurriculumInitialFormData } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
 import { useContext } from "react";
-import { mediaUploadService } from "@/services";
+import { mediaUploadService,mediaDeleteService } from "@/services";
 import MediaProgressbar from "@/components/media-progress-bar";
 import VideoPlayer from "@/components/video-player";
 
@@ -51,7 +51,7 @@ function CourseCurriculum() {
   }
 
   async function handleSingleLectureUpload(event, currentIndex) {
-    
+
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
@@ -82,17 +82,53 @@ function CourseCurriculum() {
     }
   }
 
+  async function handleReplaceVideo(currentIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    const getCurrentVideoPublicId =
+      cpyCourseCurriculumFormData[currentIndex].public_id;
+
+    const deleteCurrentMediaResponse = await mediaDeleteService(
+      getCurrentVideoPublicId
+    );
+
+    if (deleteCurrentMediaResponse?.success) {
+      cpyCourseCurriculumFormData[currentIndex] = {
+        ...cpyCourseCurriculumFormData[currentIndex],
+        videoUrl: "",
+        public_id: "",
+      };
+
+      setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+    }
+  }
+
+  function isCourseCurriculumFormDataValid() {
+    return courseCurriculumFormData.every((item) => {
+      return (
+        item &&
+        typeof item === "object" &&
+        item.title.trim() !== "" &&
+        item.videoUrl.trim() !== ""
+      );
+    });
+  }
+
   console.log(courseCurriculumFormData)
   return (
 
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row justify-between">
         <CardTitle>
           Create Course Curriclum
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Button onClick={handleNewLecture}>Add Lecture</Button>
+        <Button
+          disabled={!isCourseCurriculumFormDataValid() || mediaUploadProgress}
+          onClick={handleNewLecture}
+        >
+          Add Lecture
+        </Button>
         {mediaUploadProgress ? (
           <MediaProgressbar
             isMediaUploading={mediaUploadProgress}
@@ -125,33 +161,33 @@ function CourseCurriculum() {
 
                 </div>
                 <div className="mt-6">
-                {courseCurriculumFormData[index]?.videoUrl ? (
-                  <div className="flex gap-3">
-                    <VideoPlayer
-                      url={courseCurriculumFormData[index]?.videoUrl}
-                      width="450px"
-                      height="200px"
+                  {courseCurriculumFormData[index]?.videoUrl ? (
+                    <div className="flex gap-3">
+                      <VideoPlayer
+                        url={courseCurriculumFormData[index]?.videoUrl}
+                        width="450px"
+                        height="200px"
+                      />
+                      <Button onClick={() => handleReplaceVideo(index)}>
+                        Replace Video
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteLecture(index)}
+                        className="bg-red-900"
+                      >
+                        Delete Lecture
+                      </Button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept="video/*"
+                      onChange={(event) =>
+                        handleSingleLectureUpload(event, index)
+                      }
+                      className="mb-4"
                     />
-                    <Button onClick={() => handleReplaceVideo(index)}>
-                      Replace Video
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteLecture(index)}
-                      className="bg-red-900"
-                    >
-                      Delete Lecture
-                    </Button>
-                  </div>
-                ) : (
-                  <Input
-                    type="file"
-                    accept="video/*"
-                    onChange={(event) =>
-                      handleSingleLectureUpload(event, index)
-                    }
-                    className="mb-4"
-                  />
-                )}
+                  )}
                 </div>
               </div>
             ))
