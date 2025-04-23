@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import AuthPage from './pages/auth';
 import RouteGuard from './components/route-guard';
@@ -8,6 +8,7 @@ import StudentViewCommonLayout from './components/student-view/common-layout';
 import StudentHomePage from './pages/student/home';
 import NotFoundPage from './pages/not-found';
 import AddNewCoursePage from './pages/instructor/add-new-course';
+import StudentViewCoursesPage from "./pages/student/courses";
 
 function App() {
 
@@ -70,6 +71,7 @@ function App() {
       >
         <Route path="" element={<StudentHomePage />} />
         <Route path="home" element={<StudentHomePage />} />
+        <Route path="courses" element={<StudentViewCoursesPage />} />
 
       </Route>
       <Route path="*" element={<NotFoundPage />} />

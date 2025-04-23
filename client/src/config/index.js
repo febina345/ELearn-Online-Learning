@@ -85,6 +85,8 @@ export const languageOptions = [
     { id: "mobile-development", label: "Mobile Development" },
     { id: "game-development", label: "Game Development" },
     { id: "software-engineering", label: "Software Engineering" },
+    {id:"data_analyst",label:"Data analytics"},
+    {id:"Cyber_Security",label:"Cyber Security"}
   ];
   
   export const courseLandingPageFormControls = [

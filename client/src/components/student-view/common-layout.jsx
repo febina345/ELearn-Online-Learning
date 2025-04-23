@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import StudentViewCommonHeader from "./header";
 
 
 
@@ -6,7 +7,7 @@ import { Outlet } from "react-router-dom";
 function StudentViewCommonLayout(){
     return(
         <div>
-           Common content
+           <StudentViewCommonHeader></StudentViewCommonHeader>
            <Outlet/>
         </div>
     )
