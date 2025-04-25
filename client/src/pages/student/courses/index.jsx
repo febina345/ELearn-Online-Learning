@@ -8,16 +8,34 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
+function createSearchParamsHelper(filterParams) {
+    const queryParams = [];
+    for (const [key, value] of Object.entries(filterParams)) {
+        if (Array.isArray(value) && value.length > 0) {
+            const paramValue = value.join(",");
 
+            queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+        }
+    }
+
+    return queryParams.join("&");
+}
 
 function StudentViewCoursesPage() {
 
     const [sort, setSort] = useState("price-lowtohigh");
     const [filters, setFilters] = useState({});
-    const { studentViewCoursesList, setStudentViewCoursesList } =
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { studentViewCoursesList, setStudentViewCoursesList, loadingState,
+        setLoadingState, } =
         useContext(StudentContext);
+        const navigate = useNavigate();
+
+
     function handleFilterOnChange(getSectionId, getCurrentOption) {
         let cpyFilters = { ...filters };
         const indexOfCurrentSeection =
@@ -46,22 +64,43 @@ function StudentViewCoursesPage() {
         sessionStorage.setItem("filters", JSON.stringify(cpyFilters));
     }
 
-    async function fetchAllStudentViewCourses() {
-        const response = await fetchStudentViewCourseListService();
+    async function fetchAllStudentViewCourses(filters, sort) {
+        const query = new URLSearchParams({
+            ...filters,
+            sortBy: sort,
+        });
+        const response = await fetchStudentViewCourseListService(query);
         if (response?.success) setStudentViewCoursesList(response?.data);
+        setLoadingState(false);
     }
 
     useEffect(() => {
-        fetchAllStudentViewCourses();
+        const buildQueryStringForFilters = createSearchParamsHelper(filters);
+        setSearchParams(new URLSearchParams(buildQueryStringForFilters));
+    }, [filters]);
+
+    useEffect(() => {
+        setSort("price-lowtohigh");
+        setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+    }, []);
+    useEffect(() => {
+        return () => {
+            sessionStorage.removeItem('filters')
+        };
     }, []);
 
+    useEffect(() => {
+        if (filters !== null && sort !== null)
+            fetchAllStudentViewCourses(filters, sort);
+    }, [filters, sort]);
 
+    console.log(loadingState, "loadingState");
 
     return <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-4">All Courses</h1>
         <div className="flex flex-col md:flex-row gap-4">
             <aside className="w-full md:w-64 space-y-4">
-                <div className="p-4 space-y-4">
+                <div >
                     {Object.keys(filterOptions).map((keyItem) => (
                         <div className="p-4 border-b">
                             <h3 className="font-bold mb-3">{keyItem.toUpperCase()}</h3>
@@ -112,13 +151,14 @@ function StudentViewCoursesPage() {
                             </DropdownMenuRadioGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <span className="text-sm text-black font-bold">10Results</span>
+                    <span className="text-sm text-black font-bold">{studentViewCoursesList.length} Results</span>
                 </div>
                 <div className="space-y-4">
                     {
-                        studentViewCoursesList && studentViewCoursesList.length > 0 ?
-                            studentViewCoursesList.map(courseItem => (
-                                <Card className="cursor-pointer" key={courseItem?._id}>
+                        studentViewCoursesList && studentViewCoursesList.length > 0 ? (
+                            studentViewCoursesList.map((courseItem) => (
+                                <Card onClick={() => navigate(`/course/details/${courseItem?._id}`)}
+                                className="cursor-pointer" key={courseItem?._id}>
                                     <CardContent className="flex gap-4 p-4">
                                         <div className="w-48 h-32 flex-shrink-0">
                                             <img
@@ -149,8 +189,12 @@ function StudentViewCoursesPage() {
                                         </div>
                                     </CardContent>
                                 </Card>
-                            )) : <h1>No Courses Found</h1>
-                    }
+                            ))
+                        ) : loadingState ? (
+                            <Skeleton />
+                        ) : (
+                            <h1 className="font-extrabold text-4xl">No Courses Found</h1>
+                        )}
                 </div>
             </main>
 
