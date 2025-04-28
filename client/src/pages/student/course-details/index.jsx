@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/video-player";
+import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { fetchStudentViewCourseDetailsService } from "@/services";
+import { createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
 import { CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
 
 import { useContext, useEffect, useState } from "react";
@@ -22,9 +23,12 @@ function StudentViewCourseDetailsPage() {
         setLoadingState,
     } = useContext(StudentContext);
 
+    const { auth } = useContext(AuthContext);
+
     const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] =
         useState(null);
     const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
+    const [approvalUrl, setApprovalUrl] = useState("");
 
     const { id } = useParams();
     const location = useLocation();
@@ -47,6 +51,37 @@ function StudentViewCourseDetailsPage() {
         setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
     }
 
+    async function handleCreatePayment() {
+        const paymentPayload = {
+            userId: auth?.user?._id,
+            userName: auth?.user?.userName,
+            userEmail: auth?.user?.userEmail,
+            orderStatus: "pending",
+            paymentMethod: "paypal",
+            paymentStatus: "initiated",
+            orderDate: new Date(),
+            paymentId: "",
+            payerId: "",
+            instructorId: studentViewCourseDetails?.instructorId,
+            instructorName: studentViewCourseDetails?.instructorName,
+            courseImage: studentViewCourseDetails?.image,
+            courseTitle: studentViewCourseDetails?.title,
+            courseId: studentViewCourseDetails?._id,
+            coursePricing: studentViewCourseDetails?.pricing,
+        };
+
+        console.log(paymentPayload, "paymentPayload");
+        const response = await createPaymentService(paymentPayload);
+
+        if (response.success) {
+            sessionStorage.setItem(
+                "currentOrderId",
+                JSON.stringify(response?.data?.orderId)
+            );
+            setApprovalUrl(response?.data?.approveUrl);
+        }
+    }
+
     useEffect(() => {
         if (displayCurrentVideoFreePreview !== null) setShowFreePreviewDialog(true);
     }, [displayCurrentVideoFreePreview]);
@@ -67,13 +102,17 @@ function StudentViewCourseDetailsPage() {
 
     if (loadingState) return <Skeleton />
 
+
+    if (approvalUrl !== "") {
+        window.location.href = approvalUrl;
+    }
+
     const getIndexOfFreePreviewUrl =
         studentViewCourseDetails !== null
             ? studentViewCourseDetails?.curriculum?.findIndex(
                 (item) => item.freePreview
             )
             : -1;
-    console.log(getIndexOfFreePreviewUrl, studentViewCourseDetails?.curriculum[getIndexOfFreePreviewUrl], 'Febina');
 
 
 
@@ -176,7 +215,7 @@ function StudentViewCourseDetailsPage() {
                             <span className="text-3xl font-bold">
                                 ${studentViewCourseDetails?.pricing}
                             </span>
-                            <Button className="w-full">
+                            <Button onClick={handleCreatePayment} className="w-full">
                                 Buy Now
                             </Button>
                         </div>
@@ -184,34 +223,34 @@ function StudentViewCourseDetailsPage() {
                 </Card>
             </aside>
         </div>
-        <Dialog open={showFreePreviewDialog} 
-        onOpenChange={()=> {
-            setShowFreePreviewDialog(false)
-            setDisplayCurrentVideoFreePreview(null)
-        }
+        <Dialog open={showFreePreviewDialog}
+            onOpenChange={() => {
+                setShowFreePreviewDialog(false)
+                setDisplayCurrentVideoFreePreview(null)
+            }
 
-        }>
+            }>
             <DialogContent className="w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Course Preview</DialogTitle>
                 </DialogHeader>
                 <div className="aspect-video  rounded-lg flex items-center justify-center">
-                            <VideoPlayer
-                                url={
-                                    displayCurrentVideoFreePreview
-                                }
-                                width="450px"
-                                height="200px"
-                            />
+                    <VideoPlayer
+                        url={
+                            displayCurrentVideoFreePreview
+                        }
+                        width="450px"
+                        height="200px"
+                    />
 
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            {
-                                studentViewCourseDetails?.curriculum?.filter
-                                (item=>item.freePreview).map(filteredItem=> 
-                                <p onClick={()=>handleSetFreePreview(filteredItem)}className="cursor-pointer text-[16px] font-medium">{filteredItem?.title}</p>)
-                            }
-                        </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                    {
+                        studentViewCourseDetails?.curriculum?.filter
+                            (item => item.freePreview).map(filteredItem =>
+                                <p onClick={() => handleSetFreePreview(filteredItem)} className="cursor-pointer text-[16px] font-medium">{filteredItem?.title}</p>)
+                    }
+                </div>
                 <DialogFooter className="sm:justify-start">
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
