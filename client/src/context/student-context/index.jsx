@@ -7,9 +7,9 @@ export const StudentContext = createContext(null);
 export default function StudentProvider({ children }) {
         const [studentViewCoursesList, setStudentViewCoursesList] = useState([]);
         const [loadingState, setLoadingState] = useState(true);
-    //     // const [studentViewCourseDetails, setStudentViewCourseDetails] =
-    //     //     useState(null);
-    //     // const [currentCourseDetailsId, setCurrentCourseDetailsId] = useState(null);
+        const [studentViewCourseDetails, setStudentViewCourseDetails] =
+            useState(null);
+        const [currentCourseDetailsId, setCurrentCourseDetailsId] = useState(null);
     //     // const [studentBoughtCoursesList, setStudentBoughtCoursesList] = useState([]);
     //     // const [studentCurrentCourseProgress, setStudentCurrentCourseProgress] =
     //     //     useState({});
@@ -21,10 +21,10 @@ export default function StudentProvider({ children }) {
                         setStudentViewCoursesList,
                         loadingState,
                         setLoadingState,
-        //                 // studentViewCourseDetails,
-        //                 // setStudentViewCourseDetails,
-        //                 // currentCourseDetailsId,
-        //                 // setCurrentCourseDetailsId,
+                        studentViewCourseDetails,
+                        setStudentViewCourseDetails,
+                        currentCourseDetailsId,
+                        setCurrentCourseDetailsId,
         //                 // studentBoughtCoursesList,
         //                 // setStudentBoughtCoursesList,
         //                 // studentCurrentCourseProgress,
