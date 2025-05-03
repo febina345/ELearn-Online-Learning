@@ -1,6 +1,6 @@
 
 const Course = require("../../models/Course");
-// const StudentCourses = require("../../models/StudentCourses");
+const StudentCourses = require("../../models/StudentCourses");
 
 const getAllStudentViewCourses = async (req, res) => {
     try {
@@ -48,9 +48,8 @@ const getAllStudentViewCourses = async (req, res) => {
                 break;
         }
         const coursesList = await Course.find(filters).sort(sortParam);
-      
 
-        //         const coursesList = await Course.find(filters).sort(sortParam);
+
 
         res.status(200).json({
             success: true,
@@ -92,9 +91,31 @@ const getStudentViewCourseDetails = async (req, res) => {
     }
 };
 
+const checkCoursePurchaseInfo = async (req, res) => {
+    try {
+        const { id, studentId } = req.params;
+        const studentCourses = await StudentCourses.findOne({
+            userId: studentId,
+        });
+
+        const ifStudentAlreadyBoughtCurrentCourse =
+            studentCourses.courses.findIndex((item) => item.courseId === id) > -1;
+        res.status(200).json({
+            success: true,
+            data: ifStudentAlreadyBoughtCurrentCourse,
+        });
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            message: "Some error occured!",
+        });
+    }
+};
+
 
 module.exports = {
     getAllStudentViewCourses,
     getStudentViewCourseDetails,
-
+    checkCoursePurchaseInfo,
 };

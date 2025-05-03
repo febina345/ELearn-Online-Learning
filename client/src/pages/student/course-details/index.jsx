@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/video-player";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
+import { checkCoursePurchaseInfoService, createPaymentService, fetchStudentViewCourseDetailsService } from "@/services";
 import { CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
 
 import { useContext, useEffect, useState } from "react";
@@ -32,7 +32,22 @@ function StudentViewCourseDetailsPage() {
 
     const { id } = useParams();
     const location = useLocation();
+
     async function fetchStudentViewCourseDetails() {
+        const checkCoursePurchaseInfoResponse =
+            await checkCoursePurchaseInfoService(
+                currentCourseDetailsId,
+                auth?.user._id
+            );
+
+        if (
+            checkCoursePurchaseInfoResponse?.success &&
+            checkCoursePurchaseInfoResponse?.data
+        ) {
+            navigate(`/course-progress/${currentCourseDetailsId}`);
+            return;
+        }
+
         const response = await fetchStudentViewCourseDetailsService(
             currentCourseDetailsId
         );
