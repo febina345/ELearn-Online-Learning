@@ -30,7 +30,7 @@ function InstructorDashboardpage() {
             icon: BarChart,
             label: "Dashboard",
             value: "dashboard",
-            component: <InstructorDashboard  />,
+            component: <InstructorDashboard listOfCourses={instructorCoursesList} />,
         },
         {
             icon: Book,
@@ -49,6 +49,8 @@ function InstructorDashboardpage() {
         resetCredentials();
         sessionStorage.clear();
     }
+
+    console.log(instructorCoursesList, "instructorCoursesList");
 
   
 

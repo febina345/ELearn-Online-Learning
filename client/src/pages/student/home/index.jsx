@@ -3,36 +3,48 @@ import banner from "../../../../public/Banner.jpg";
 import { courseCategories } from "@/config";
 import { useContext, useEffect } from "react";
 import { StudentContext } from "@/context/student-context";
-//import { AuthContext } from "@/context/auth-context";
-//import { useNavigate } from "react-router-dom";
-import { fetchStudentViewCourseListService } from "@/services";
+import { AuthContext } from "@/context/auth-context";
+import { useNavigate } from "react-router-dom";
+import { checkCoursePurchaseInfoService, fetchStudentViewCourseListService } from "@/services";
 
 
 function StudentHomePage() {
     const { studentViewCoursesList, setStudentViewCoursesList } =
         useContext(StudentContext);
-    // const { auth } = useContext(AuthContext);
-   // const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
+   const navigate = useNavigate();
+
+   function handleNavigateToCoursesPage(getCurrentId) {
+    console.log(getCurrentId);
+    sessionStorage.removeItem("filters");
+    const currentFilter = {
+      category: [getCurrentId],
+    };
+
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+
+    navigate("/courses");
+  }
 
     async function fetchAllStudentViewCourses() {
         const response = await fetchStudentViewCourseListService();
         if (response?.success) setStudentViewCoursesList(response?.data);
     }
 
-    // async function handleCourseNavigate(getCurrentCourseId) {
-    //     const response = await checkCoursePurchaseInfoService(
-    //         getCurrentCourseId,
-    //         auth?.user?._id
-    //     );
+    async function handleCourseNavigate(getCurrentCourseId) {
+        const response = await checkCoursePurchaseInfoService(
+            getCurrentCourseId,
+            auth?.user?._id
+        );
 
-    //     if (response?.success) {
-    //         if (response?.data) {
-    //             navigate(`/course-progress/${getCurrentCourseId}`);
-    //         } else {
-    //             navigate(`/course/details/${getCurrentCourseId}`);
-    //         }
-    //     }
-    // }
+        if (response?.success) {
+            if (response?.data) {
+                navigate(`/course-progress/${getCurrentCourseId}`);
+            } else {
+                navigate(`/course/details/${getCurrentCourseId}`);
+            }
+        }
+    }
 
     useEffect(() => {
         fetchAllStudentViewCourses();

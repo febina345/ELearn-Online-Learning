@@ -9,6 +9,64 @@ const StudentCourses = require("../../models/StudentCourses");
 //mark current lecture as viewed
 const markCurrentLectureAsViewed = async (req, res) => {
     try {
+        const { userId, courseId, lectureId } = req.body;
+        let progress = await CourseProgress.findOne({ userId, courseId });
+        if (!progress) {
+            progress = new CourseProgress({
+                userId,
+                courseId,
+                lecturesProgress: [
+                    {
+                        lectureId,
+                        viewed: true,
+                        dateViewed: new Date(),
+                    },
+                ],
+            });
+            await progress.save();
+
+        } else {
+            const lectureProgress = progress.lecturesProgress.find(
+                (item) => item.lectureId === lectureId
+            );
+            if (lectureProgress) {
+                lectureProgress.viewed = true;
+                lectureProgress.dateViewed = new Date();
+            } else {
+                progress.lecturesProgress.push({
+                    lectureId,
+                    viewed: true,
+                    dateViewed: new Date(),
+                });
+            }
+            await progress.save();
+        }
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+            });
+        }
+
+        //check all the lectures are viewed or not
+        const allLecturesViewed =
+            progress.lecturesProgress.length === course.curriculum.length &&
+            progress.lecturesProgress.every((item) => item.viewed);
+
+        if (allLecturesViewed) {
+            progress.completed = true;
+            progress.completionDate = new Date();
+
+            await progress.save();
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Lecture status is viewed",
+            data: progress,
+        });
 
     } catch (error) {
         console.log(error);
@@ -28,17 +86,22 @@ const markCurrentLectureAsViewed = async (req, res) => {
 const getCurrentCourseProgress = async (req, res) => {
     try {
         const { userId, courseId } = req.params;
+
         const studentPurchasedCourses = await StudentCourses.findOne({ userId });
 
         const isCurrentCoursePurchasedByCurrentUserOrNot =
-            studentPurchasedCourses?.courses?.findIndex(item => item.courseId === courseId) > -1;
+            studentPurchasedCourses?.courses?.findIndex(
+                (item) => item.courseId === courseId
+            ) > -1;
 
         if (!isCurrentCoursePurchasedByCurrentUserOrNot) {
             return res.status(200).json({
                 success: true,
-                isPurchased: false,
-                message: "Please Purchase the course to have access"
-            })
+                data: {
+                    isPurchased: false,
+                },
+                message: "You need to purchase this course to access it.",
+            });
         }
         const currentUserCourseProgress = await CourseProgress.findOne({
             userId,
@@ -64,6 +127,7 @@ const getCurrentCourseProgress = async (req, res) => {
                     courseDetails: course,
                     progress: [],
                     isPurchased: true,
+
                 },
             });
         }
@@ -98,6 +162,28 @@ const getCurrentCourseProgress = async (req, res) => {
 
 const resetCurrentCourseProgress = async (req, res) => {
     try {
+        const { userId, courseId } = req.body;
+
+        const progress = await CourseProgress.findOne({ userId, courseId });
+
+        if (!progress) {
+            return res.status(404).json({
+                success: false,
+                message: "Invalid Progress!",
+            });
+        }
+
+        progress.lecturesProgress = [];
+        progress.completed = false;
+        progress.completionDate = null;
+
+        await progress.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully Reset Course Progress!",
+            data: progress,
+        });
 
     } catch (error) {
         console.log(error);
