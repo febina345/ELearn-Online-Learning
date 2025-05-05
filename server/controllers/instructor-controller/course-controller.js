@@ -1,4 +1,5 @@
 const Course = require("../../models/Course");
+// const { deleteMediaFromCloudinary } = require("../../helpers/cloudinary");
 
 const addNewCourse = async (req, res) => {
   try {
@@ -34,10 +35,11 @@ const getAllCourses = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Something went wrong!",
+      message: "Some error occured!",
     });
   }
-};
+}
+
 
 const getCourseDetailsByID = async (req, res) => {
   try {
@@ -96,9 +98,14 @@ const updateCourseByID = async (req, res) => {
   }
 };
 
+
+
+
+
 module.exports = {
   addNewCourse,
   getAllCourses,
   updateCourseByID,
   getCourseDetailsByID,
+  
 };

@@ -11,6 +11,7 @@ import { Check, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useNavigate, useParams } from "react-router-dom";
+import html2pdf from 'html2pdf.js'; // Import html2pdf.js
 
 function StudentViewCourseProgressPage() {
 
@@ -24,6 +25,7 @@ function StudentViewCourseProgressPage() {
         useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+    const [certificateGenerated, setCertificateGenerated] = useState(false);
 
     const { id } = useParams();
 
@@ -69,31 +71,70 @@ function StudentViewCourseProgressPage() {
 
     async function updateCourseProgress() {
         if (currentLecture) {
-          const response = await markLectureAsViewedService(
-            auth?.user?._id,
-            studentCurrentCourseProgress?.courseDetails?._id,
-            currentLecture._id
-          );
-    
-          if (response?.success) {
-            fetchCurrentCourseProgress();
-          }
-        }
-      }
+            const response = await markLectureAsViewedService(
+                auth?.user?._id,
+                studentCurrentCourseProgress?.courseDetails?._id,
+                currentLecture._id
+            );
 
-      async function handleRewatchCourse() {
-        const response = await resetCourseProgressService(
-          auth?.user?._id,
-          studentCurrentCourseProgress?.courseDetails?._id
-        );
-    
-        if (response?.success) {
-          setCurrentLecture(null);
-          setShowConfetti(false);
-          setShowCourseCompleteDialog(false);
-          fetchCurrentCourseProgress();
+            if (response?.success) {
+                fetchCurrentCourseProgress();
+            }
         }
-      }
+    }
+
+    async function handleRewatchCourse() {
+        const response = await resetCourseProgressService(
+            auth?.user?._id,
+            studentCurrentCourseProgress?.courseDetails?._id
+        );
+
+        if (response?.success) {
+            setCurrentLecture(null);
+            setShowConfetti(false);
+            setShowCourseCompleteDialog(false);
+            fetchCurrentCourseProgress();
+        }
+    }
+
+    const generateCertificate = () => {
+        const element = document.getElementById('certificate');
+        if (element) {
+            // Adding text to the certificate dynamically
+            const certificateContent = `
+                <div style="text-align: center; font-size: 24px; margin-top: 50px; margin-bottom:50px;">
+                    <h1 style="font-size: 36px; font-weight: bold;">${studentCurrentCourseProgress?.courseDetails?.title}</h1>
+                    <p style="font-size: 24px; margin-top: 20px;">Certificate of Completion</p>
+                   <p style="font-size: 20px; margin-top: 30px;">Congratulations ${auth?.user?.userName || 'Student'}!</p>
+                    <p style="font-size: 18px; margin-top: 15px;">You have successfully completed the course.</p>
+                    <p style="font-size: 16px; margin-top: 20px;">Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+       
+            element.innerHTML = certificateContent;  // Set the dynamic content to the certificate element
+            
+            // Show the certificate div temporarily (for rendering)
+            element.style.display = 'block';
+    
+            const options = {
+                filename: `${studentCurrentCourseProgress?.courseDetails?.title}_Certificate.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 4 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape', margin: [20, 20, 20, 20] },
+            };
+    
+            html2pdf().from(element).set(options).save();
+    
+            // Hide the certificate div after download (optional)
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 1000);  // Hide it after 1 second
+    
+            setCertificateGenerated(true);  // Track that the certificate is generated
+        }
+    };
+    
+
 
 
     useEffect(() => {
@@ -102,7 +143,7 @@ function StudentViewCourseProgressPage() {
 
     useEffect(() => {
         if (currentLecture?.progressValue === 1) updateCourseProgress();
-      }, [currentLecture]);
+    }, [currentLecture]);
 
 
     useEffect(() => {
@@ -215,7 +256,7 @@ function StudentViewCourseProgressPage() {
                 </DialogContent>
             </Dialog>
             <Dialog open={showCourseCompleteDialog}>
-                <DialogContent showOverlay={false} className="sm:w-[425px]">
+                <DialogContent showOverlay={false} className="sm:w-[600px]">
                     <DialogHeader>
                         <DialogTitle>Congratulations!</DialogTitle>
                         <DialogDescription className="flex flex-col gap-3">
@@ -225,11 +266,26 @@ function StudentViewCourseProgressPage() {
                                     My Courses Page
                                 </Button>
                                 <Button onClick={handleRewatchCourse}>Rewatch Course</Button>
+                                {!certificateGenerated && (
+                                    <Button onClick={generateCertificate}>Download Certificate</Button>
+                                )}
                             </div>
                         </DialogDescription>
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
+
+            {/* Certificate */}
+            <div id="certificate" style={{ display: 'none' }}>
+                {/* <div style={{ textAlign: 'center', fontSize: '24px', marginTop: '50px' }}>
+                    <h1>{studentCurrentCourseProgress?.courseDetails?.title}</h1>
+                    <p>Certificate of Completion</p>
+                    <p>Congratulations {auth?.user?.name}!</p>
+                    <p>You have successfully completed the course.</p>
+                    <p>Date: {new Date().toLocaleDateString()}</p>
+                </div> */}
+            </div>
+
         </div>);
 
 }

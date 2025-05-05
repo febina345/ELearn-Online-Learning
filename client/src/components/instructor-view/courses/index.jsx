@@ -16,6 +16,7 @@ function InstructorCourses({ listOfCourses }) {
     setCourseLandingFormData,
     setCourseCurriculumFormData,
   } = useContext(InstructorContext);
+    
 
   return <Card>
     <CardHeader className="flex justify-between flex-row items-center">
@@ -68,6 +69,7 @@ function InstructorCourses({ listOfCourses }) {
                     <Button variant="ghost" size="sm">
                       <Delete className="h-6 w-6" />
                     </Button>
+    
                   </TableCell>
                 </TableRow>
               ))
@@ -79,5 +81,7 @@ function InstructorCourses({ listOfCourses }) {
     </CardContent>
   </Card>
 }
+
+
 
 export default InstructorCourses;
