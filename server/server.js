@@ -9,6 +9,7 @@ const studentViewCourseRoutes = require("./routes/student-routes/course-routes")
 const studentViewOrderRoutes = require("./routes/student-routes/order-routes");
 const studentCoursesRoutes = require("./routes/student-routes/student-courses-routes");
 const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,11 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(bodyParser.json());
+
+// Chatbot route
+const chatbotRoute = require('./routes/chatbot-routes/chatbot');
+app.use('/api/chatbot', chatbotRoute);
 
 //database connection exists here
 

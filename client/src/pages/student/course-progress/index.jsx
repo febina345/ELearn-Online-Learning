@@ -230,9 +230,11 @@ function StudentViewCourseProgressPage() {
 
 
     return (
+        
         <div className="flex flex-col h-screen bg-[#1c1d1f] text-white">
             {showConfetti && <ReactConfetti />}
 
+            <div>
             {showQuiz && (
                 <div className="p-6 bg-gray-800 rounded-lg shadow-lg max-w-2xl mx-auto mt-10">
                     <h2 className="text-2xl font-bold mb-4 text-white">Final Quiz</h2>
@@ -272,8 +274,11 @@ function StudentViewCourseProgressPage() {
                             {quizPassed ? "You passed the quiz!" : "You did not pass the quiz. Please try again."}
                         </p>
                     )}
+                
                 </div>
             )}
+            </div>
+
             <div className="flex items-center justify-between p-4 bg-[#1c1d1f] border-b border-gray-700">
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => navigate("/student-courses")} className="text-black" variant="ghost" size="sm">
@@ -414,6 +419,7 @@ function StudentViewCourseProgressPage() {
 
 
         </div>);
+        
 
 }
 
