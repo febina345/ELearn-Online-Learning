@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -140,6 +140,7 @@ function InstructorDashboard({ listOfCourses }) {
         </CardContent>
       </Card>
     </div>
+    
   );
 }
 

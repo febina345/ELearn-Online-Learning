@@ -166,6 +166,8 @@ function StudentViewCourseProgressPage() {
         }
     }
 
+    console.log("Quiz Questions", quizQuestions)
+
     // function generateCertificate() {
     //     const element = certificateRef.current;
     //     html2pdf().from(element).save(`certificate-${auth?.user?.userName}.pdf`);
@@ -202,7 +204,7 @@ function StudentViewCourseProgressPage() {
 
             html2pdf().from(element).set(options).save();
 
-            // Hide the certificate div after download (optional)
+            // Hide the certificate div after download
             setTimeout(() => {
                 element.style.display = 'none';
             }, 1000);  // Hide it after 1 second
@@ -210,8 +212,6 @@ function StudentViewCourseProgressPage() {
             setCertificateGenerated(true);  // Track that the certificate is generated
         }
     };
-
-
 
 
     useEffect(() => {
@@ -230,14 +230,16 @@ function StudentViewCourseProgressPage() {
 
 
     return (
-        
+
         <div className="flex flex-col h-screen bg-[#1c1d1f] text-white">
             {showConfetti && <ReactConfetti />}
 
-            <div>
-            {showQuiz && (
-                <div className="p-6 bg-gray-800 rounded-lg shadow-lg max-w-2xl mx-auto mt-10">
-                    <h2 className="text-2xl font-bold mb-4 text-white">Final Quiz</h2>
+
+            <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
+                <DialogContent className="sm:max-w-2xl bg-gray-900 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold mb-4">Final Quiz</DialogTitle>
+                    </DialogHeader>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
@@ -246,16 +248,16 @@ function StudentViewCourseProgressPage() {
                     >
                         {quizQuestions.map((q) => (
                             <div key={q.id} className="mb-6">
-                                <p className="text-white mb-2">{q.question}</p>
+                                <p className="font-medium">{q.question}</p>
                                 {q.options.map((opt, idx) => (
-                                    <label key={idx} className="block text-white ml-2">
+                                    <label key={idx} className="block mt-1">
                                         <input
                                             type="radio"
                                             name={`q${q.id}`}
                                             value={idx}
                                             checked={quizAnswers[q.id] === idx}
                                             onChange={() =>
-                                                setQuizAnswers({ ...quizAnswers, [q.id]: idx })
+                                                setQuizAnswers((prev) => ({ ...prev, [q.id]: idx }))
                                             }
                                             className="mr-2"
                                         />
@@ -264,20 +266,23 @@ function StudentViewCourseProgressPage() {
                                 ))}
                             </div>
                         ))}
-                        <Button type="submit" className="mt-4">
+                        <Button type="submit" className="mt-4 w-full">
                             Submit Quiz
                         </Button>
                     </form>
 
                     {quizSubmitted && (
-                        <p className="mt-4 text-white">
-                            {quizPassed ? "You passed the quiz!" : "You did not pass the quiz. Please try again."}
-                        </p>
+                        <div className="mt-4 text-center font-semibold">
+                            {quizPassed ? (
+                                <span className="text-green-400">You passed the quiz! 🎉</span>
+                            ) : (
+                                <span className="text-red-400">You did not pass. Try again!</span>
+                            )}
+                        </div>
                     )}
-                
-                </div>
-            )}
-            </div>
+                </DialogContent>
+            </Dialog>
+
 
             <div className="flex items-center justify-between p-4 bg-[#1c1d1f] border-b border-gray-700">
                 <div className="flex items-center space-x-4">
@@ -390,14 +395,16 @@ function StudentViewCourseProgressPage() {
                                     <Button className="px-1 text-sm" onClick={() => navigate("/student-courses")}>
                                         My Courses Page
                                     </Button>
-
-
-                                    <Button className="px-1 text-sm" onClick={handleRewatchCourse}>Rewatch Course</Button>
-                                    <Button className="px-1 text-sm" onClick={() => setShowQuiz(true)} >
+                                    <Button className="px-1 text-sm" onClick={handleRewatchCourse}>
+                                        Rewatch Course
+                                    </Button>
+                                    <Button className="px-1 text-sm" onClick={() => setShowQuiz(true)}>
                                         Take Final Quiz
                                     </Button>
                                     {!certificateGenerated && (
-                                        <Button className="px-1 text-sm" onClick={generateCertificate}>Download Certificate</Button>
+                                        <Button className="px-1 text-sm" onClick={generateCertificate}>
+                                            Download Certificate
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -405,7 +412,7 @@ function StudentViewCourseProgressPage() {
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
-          
+
             {/* Certificate */}
             <div id="certificate" style={{ display: 'none' }}>
                 {/* <div style={{ textAlign: 'center', fontSize: '24px', marginTop: '50px' }}>
@@ -419,7 +426,7 @@ function StudentViewCourseProgressPage() {
 
 
         </div>);
-        
+
 
 }
 

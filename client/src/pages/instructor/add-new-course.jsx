@@ -156,6 +156,9 @@ function AddNewCoursePage() {
           </div>
         </CardContent>
       </Card>
+      <footer className="mt-10 text-center text-sm text-muted-foreground">
+        <p>ERIYADAN FEBINA   |   ID:FEBIN57109  |  UNIVERSITY OF ESSEX</p>
+      </footer>
     </div>
   )
 }

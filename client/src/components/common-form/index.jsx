@@ -22,4 +22,4 @@ function CommonForm({handleSubmit,buttonText,
     );
 }
 
-export default CommonForm
+export default CommonForm;

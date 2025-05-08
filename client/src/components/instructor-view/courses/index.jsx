@@ -76,10 +76,11 @@ function InstructorCourses({ listOfCourses }) {
               : null}
           </TableBody>
         </Table>
-
       </div>
     </CardContent>
   </Card>
+
+  
 }
 
 

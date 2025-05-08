@@ -12,19 +12,19 @@ function StudentHomePage() {
     const { studentViewCoursesList, setStudentViewCoursesList } =
         useContext(StudentContext);
     const { auth } = useContext(AuthContext);
-   const navigate = useNavigate();
+    const navigate = useNavigate();
 
-   function handleNavigateToCoursesPage(getCurrentId) {
-    console.log(getCurrentId);
-    sessionStorage.removeItem("filters");
-    const currentFilter = {
-      category: [getCurrentId],
-    };
+    function handleNavigateToCoursesPage(getCurrentId) {
+        console.log(getCurrentId);
+        sessionStorage.removeItem("filters");
+        const currentFilter = {
+            category: [getCurrentId],
+        };
 
-    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+        sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
-    navigate("/courses");
-  }
+        navigate("/courses");
+    }
 
     async function fetchAllStudentViewCourses() {
         const response = await fetchStudentViewCourseListService();
@@ -112,8 +112,14 @@ function StudentHomePage() {
                     ) : (
                         <h1>No Courses Found</h1>
                     )}
+
+
                 </div>
-            </section> 
+
+            </section>
+            <footer className="mt-10 text-center text-sm text-muted-foreground">
+                <p>ERIYADAN FEBINA   |   ID:FEBIN57109  |  UNIVERSITY OF ESSEX</p>
+            </footer>
         </div>
     )
 

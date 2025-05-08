@@ -6,7 +6,9 @@ import { AuthContext } from "@/context/auth-context";
 
 function StudentViewCommonHeader() {
   const navigate = useNavigate();
-  const { resetCredentials } = useContext(AuthContext);
+  const { resetCredentials, auth } = useContext(AuthContext);
+  
+  
 
   function handleLogout() {
     resetCredentials();
@@ -38,6 +40,11 @@ function StudentViewCommonHeader() {
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex gap-4 items-center">
+          {auth?.user?.userName && (
+            <span className="font-semibold text-sm md:text-base uppercase">
+              WELCOME, {auth.user.userName.toUpperCase()}
+            </span>
+          )}
           <div
             onClick={() => navigate("/student-courses")}
             className="flex cursor-pointer items-center gap-3"
@@ -51,6 +58,7 @@ function StudentViewCommonHeader() {
         </div>
       </div>
     </header>
+
   );
 }
 

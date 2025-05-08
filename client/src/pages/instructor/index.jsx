@@ -13,16 +13,16 @@ function InstructorDashboardpage() {
     const [activeTab, setActiveTab] = useState("dashboard");
     const { resetCredentials } = useContext(AuthContext);
     const { instructorCoursesList, setInstructorCoursesList } =
-    useContext(InstructorContext);
+        useContext(InstructorContext);
 
     async function fetchAllCourses() {
         const response = await fetchInstructorCourseListService();
         if (response?.success) setInstructorCoursesList(response?.data);
-      }
-    
-      useEffect(() => {
+    }
+
+    useEffect(() => {
         fetchAllCourses();
-      }, []);
+    }, []);
 
 
     const menuItems = [
@@ -52,7 +52,7 @@ function InstructorDashboardpage() {
 
     console.log(instructorCoursesList, "instructorCoursesList");
 
-  
+
 
     return (<div className="flex h-full min-h-screen bg-gray-100">
         <aside className="w-64 bg-white shadow-md hidden md:block">
@@ -88,8 +88,13 @@ function InstructorDashboardpage() {
                         </TabsContent>
                     ))}
                 </Tabs>
+
+                <footer className="mt-10 text-center text-sm text-muted-foreground">
+                    <p>ERIYADAN FEBINA   |   ID:FEBIN57109  |  UNIVERSITY OF ESSEX</p>
+                </footer>
             </div>
         </main>
+
     </div>
     )
 }

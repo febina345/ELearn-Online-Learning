@@ -61,6 +61,7 @@ function StudentCoursesPage() {
           <h1 className="text-3xl font-bold">No Courses found</h1>
         )}
       </div>
+     
     </div>
   );
 }

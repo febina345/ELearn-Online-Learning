@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 
 // Chatbot route
 const chatbotRoute = require('./routes/chatbot-routes/chatbot');
-app.use('/api/chatbot', chatbotRoute);
+
 
 //database connection exists here
 
@@ -44,7 +44,7 @@ app.use("/student/course", studentViewCourseRoutes);
 app.use("/student/order", studentViewOrderRoutes);
 app.use("/student/courses-bought", studentCoursesRoutes);
 app.use("/student/course-progress", studentCourseProgressRoutes);
-
+app.use('/api/chatbot', chatbotRoute);
 
 app.use((err,req,res,next)=>{
     console.log(err.stack);
