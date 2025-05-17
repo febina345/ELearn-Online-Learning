@@ -32,7 +32,7 @@ const Chatbot = ({ userId }) => {
   return (
     <div className="fixed bottom-4 right-4 w-80 bg-white border border-gray-300 shadow-lg rounded-lg z-50">
       <div className="bg-blue-500 text-white px-4 py-2 flex justify-between items-center rounded-t-lg cursor-pointer" onClick={() => setIsMinimized(!isMinimized)}>
-        <span>LMS Chatbot</span>
+        <span>E-Learn Chatbot</span>
         {isMinimized ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </div>
       {!isMinimized && (
