@@ -1,7 +1,7 @@
 // require("dotenv").config();
 // const OpenAI = require("openai");
-// const User = require('../../models/User'); // Assuming you have a User model
-// const Course = require('../../models/Course'); // Assuming you have a Course model
+// const User = require('../../models/User'); 
+// const Course = require('../../models/Course'); 
 
 // const openai = new OpenAI({
 //   apiKey: process.env.OPENAI_API_KEY,
